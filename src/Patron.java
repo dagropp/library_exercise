@@ -4,12 +4,12 @@
  * @author dgropp
  */
 class Patron {
-    final String patronFirstName; // The first name of this patron.
-    final String patronLastName; // The last name of this patron.
-    final int comicTendency; // The weight this patron assigns to the comic aspects of books.
-    final int dramaticTendency; // The weight this patron assigns to the dramatic aspects of books.
-    final int educationalTendency; // The weight this patron assigns to the educational aspects of books.
-    final int patronEnjoymentThreshold; // The minimal literary value a book must have for this patron to enjoy it.
+    final String FIRST_NAME; // The first name of this patron.
+    final String LAST_NAME; // The last name of this patron.
+    final int COMIC_TENDENCY; // The weight this patron assigns to the comic aspects of books.
+    final int DRAMATIC_TENDENCY; // The weight this patron assigns to the dramatic aspects of books.
+    final int EDUCATIONAL_TENDENCY; // The weight this patron assigns to the educational aspects of books.
+    final int ENJOYMENT_THRESHOLD; // The minimal literary value a book must have for this patron to enjoy it.
     int borrowedBooks;
 
     /*----=  Constructors  =-----*/
@@ -30,12 +30,12 @@ class Patron {
            int dramaticTendency,
            int educationalTendency,
            int patronEnjoymentThreshold) {
-        this.patronFirstName = patronFirstName;
-        this.patronLastName = patronLastName;
-        this.comicTendency = comicTendency;
-        this.dramaticTendency = dramaticTendency;
-        this.educationalTendency = educationalTendency;
-        this.patronEnjoymentThreshold = patronEnjoymentThreshold;
+        this.FIRST_NAME = patronFirstName;
+        this.LAST_NAME = patronLastName;
+        this.COMIC_TENDENCY = comicTendency;
+        this.DRAMATIC_TENDENCY = dramaticTendency;
+        this.EDUCATIONAL_TENDENCY = educationalTendency;
+        this.ENJOYMENT_THRESHOLD = patronEnjoymentThreshold;
         this.borrowedBooks = 0;
     }
 
@@ -49,7 +49,7 @@ class Patron {
      * @return the String representation of this patron.
      */
     String stringRepresentation() {
-        return this.patronFirstName + " " + this.patronLastName;
+        return this.FIRST_NAME + " " + this.LAST_NAME;
     }
 
     /**
@@ -60,9 +60,9 @@ class Patron {
      */
     int getBookScore(Book book) {
         // Multiplies patron's comic/dramatic/educational tendencies with the book's respective values.
-        int totalComedy = this.comicTendency * book.getComicValue();
-        int totalDrama = this.dramaticTendency * book.getDramaticValue();
-        int totalEducation = this.educationalTendency * book.getEducationalValue();
+        int totalComedy = this.COMIC_TENDENCY * book.getComicValue();
+        int totalDrama = this.DRAMATIC_TENDENCY * book.getDramaticValue();
+        int totalEducation = this.EDUCATIONAL_TENDENCY * book.getEducationalValue();
         return totalComedy + totalDrama + totalEducation; // Sum of all multiplications.
     }
 
@@ -73,6 +73,18 @@ class Patron {
      * @return true of this patron will enjoy the given book, false otherwise.
      */
     boolean willEnjoyBook(Book book) {
-        return this.getBookScore(book) >= this.patronEnjoymentThreshold;
+        return this.getBookScore(book) >= this.ENJOYMENT_THRESHOLD;
+    }
+
+    void addBorrow() {
+        this.borrowedBooks++;
+    }
+
+    void returnBorrow() {
+        this.borrowedBooks--;
+    }
+
+    int getBorrowedBooks() {
+        return this.borrowedBooks;
     }
 }

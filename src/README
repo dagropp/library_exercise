@@ -23,21 +23,24 @@ Library.java -  This class represents a library, which hold a collection of book
 - Insert books/patrons -
     Inserting new object to the array requires finding the first null field, that comes after an existing object. If
     no null fields found, it means the array is full (reached max capacity). To find this first null field, one must go
-    over the whole array. But, as the array can hold many entries and it is sorted (new entry always comes after an
-    existing entry), I defined a binary search method to find the first null field (worst case: O(log n)).
+    over the whole array. It could have been possible to use binary search algorithm, as the array is sorted (new entry
+    always comes after an existing entry), but it is also required to check if new object already exists on the array,
+    and Object fields are not sorted. In conclusion, I found it necessary to loop over the whole array until found a
+    duplicate Object or found first null field (worst case: O(n)).
 - Books suggestions -
     Each book gets a score for this patron, based on instructions in the assignment API. After that another method
     compares this book's score to patron's minimal enjoyment threshold, and assumes patron will enjoy the book if
     the score is bigger/equal to patron's minimal enjoyment threshold. The book suggestion method goes over the whole
     books array and seeks an available book (not borrowed) that meets this enjoyment assumption, if found.
     The method uses a loop that breaks once a relevant book found or reached null/end of array (worst case: O(n)).
+- Max borrows -
+    On each Patron object construction, starts borrows counter. Each book assigned to patron, adds 1 to patron. Each
+    book returned by patron, removes 1 from patron. When patron tries to borrow new book, instead of iterating on the
+    whole book array (O(n)), comparing the borrows counter to the max borrowed assigned (O(1)).
 - Borrow book -
     This method needs to check few tests before it can assign book to patron: (1) IDs are valid. (2) patron will enjoy
-    book. (3) book is available. (4) patron has not reached its max borrows. Tests 1-3 are described in assignment API,
-    and are called and assigned to boolean values. Test 4 calls a helper method, that goes over the whole book array.
-    The method uses recursive algorithm, that checks each book for borrower ID. Each time the ID matches the patron's
-    ID it calls the method again with updated counter. Once it reaches the max borrow number allowed, or reaches first
-    null/end of array, it breaks and return the result respectively (worst case: O(n)).
+    book. (3) book is available. (4) patron has not reached max borrows. Tests 1-3 are described in assignment API, and
+    are called and assigned to boolean values. Test 4 described above. When all tests pass, book is marked as borrowed.
 - Helper methods -
     Some actions regarding books and patrons insertion, validation, etc. seemed quite similar. To avoid writing code
     twice, I defined helper methods to insert book/patrons, to validate and fetch their IDs, and to handle more

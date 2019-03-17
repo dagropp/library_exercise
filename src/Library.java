@@ -7,11 +7,11 @@
 
 class Library {
 
-    final int maxBookCapacity; // The maximal number of books this library can hold.
-    final int maxBorrowedBooks; // The maximal number of books this library allows a patron to borrow at the same time.
-    final int maxPatronCapacity; // The maximal number of registered patrons this library can handle.
+    final int MAX_BOOKS; // The maximal number of books this library can hold.
+    final int MAX_BORROWS; // The maximal number of books this library allows a patron to borrow at the same time.
+    final int MAX_PATRONS; // The maximal number of registered patrons this library can handle.
     Book[] libraryBooks; // Array of all library books and open book slots.
-    Patron[] libraryPatrons; // Array of all library patrons and open patron slots.
+    Patron[] libraryPatrons; // Array of all library patrons and open patron slots
 
     /*----=  Constructors  =-----*/
 
@@ -26,13 +26,13 @@ class Library {
     Library(int maxBookCapacity,
             int maxBorrowedBooks,
             int maxPatronCapacity) {
-        this.maxBookCapacity = maxBookCapacity;
-        this.maxBorrowedBooks = maxBorrowedBooks;
-        this.maxPatronCapacity = maxPatronCapacity;
+        this.MAX_BOOKS = maxBookCapacity;
+        this.MAX_BORROWS = maxBorrowedBooks;
+        this.MAX_PATRONS = maxPatronCapacity;
         // Assign books array with null Book objects to match max nook capacity.
-        this.libraryBooks = new Book[maxBookCapacity];
+        this.libraryBooks = new Book[this.MAX_BOOKS];
         // Assign patrons array with null Patron objects to match max patron capacity.
-        this.libraryPatrons = new Patron[maxPatronCapacity];
+        this.libraryPatrons = new Patron[this.MAX_PATRONS];
     }
 
     /*----=  Instance Methods  =-----*/
@@ -45,7 +45,7 @@ class Library {
      * or if the book was already in the library; a negative number otherwise.
      */
     int addBookToLibrary(Book book) {
-        return this.attemptInsert(book, this.libraryBooks); // Call attemptInsert() helper method.
+        return this.attemptInsert(book, this.libraryBooks);
     }
 
     /**
@@ -125,8 +125,9 @@ class Library {
     boolean borrowBook(int bookId, int patronId) {
         // Before starting whole process, checks if book and patron ID's are valid.
         if (this.isBookIdValid(bookId) && this.isPatronIdValid(patronId)) {
-            // Call patronCanBorrow() helper method to determine if patron can borrow book.
-            boolean canBorrow = this.patronCanBorrow(patronId, 0, 0);
+            Patron patron = this.libraryPatrons[patronId];
+            // See if patron's borrowed books num is smaller than max borrowed books var.
+            boolean canBorrow = patron.getBorrowedBooks() < this.MAX_BORROWS;
             // Call willEnjoyBook() method from Patron class to determine if patron will enjoy the book.
             boolean willEnjoy = this.libraryPatrons[patronId].willEnjoyBook(this.libraryBooks[bookId]);
             // Call isBookAvailable() method to determine if book is available to borrow.
@@ -134,6 +135,7 @@ class Library {
             // If all tests were true, mark book as borrowed to this patron, and return true.
             if (canBorrow && willEnjoy && isAvailable) {
                 this.libraryBooks[bookId].setBorrowerId(patronId);
+                this.libraryPatrons[patronId].addBorrow();
                 return true;
             }
         }
@@ -147,7 +149,11 @@ class Library {
      */
     void returnBook(int bookId) {
         if (this.isBookIdValid(bookId)) {
-            this.libraryBooks[bookId].returnBook();
+            int borrowerId = this.libraryBooks[bookId].getCurrentBorrowerId();
+            if (this.isPatronIdValid(borrowerId)) {
+                this.libraryPatrons[borrowerId].returnBorrow();
+                this.libraryBooks[bookId].returnBook();
+            }
         }
     }
 
@@ -184,41 +190,18 @@ class Library {
      * @param input Object to insert to array.
      * @param list  Array to check and insert object input.
      * @return A non-negative id number for the insert if the input was successfully added,
-     * or if the book was already in the library; a negative number otherwise.
+     * or if the input was already in the list; a negative number otherwise.
      */
     int attemptInsert(Object input, Object[] list) {
-        int insertIdx = this.findFreeSlot(list, 0, list.length - 1); // Call findFreeSlot() helper method.
-        // If found index slot is not default number (-1), assign input to this slot.
-        if (insertIdx != -1) {
-            list[insertIdx] = input;
+        for (int id = 0; id < list.length; id++) {
+            if (list[id] == input) {
+                return id;
+            } else if (list[id] == null) {
+                list[id] = input;
+                return id;
+            }
         }
-        return insertIdx; // Either insert index or return -1.
-    }
-
-    /**
-     * Helper recursive method for attemptInsert() method, that uses binary search algorithm
-     * to find the first array field that is null (if any).
-     *
-     * @param list  Array to find first field that is null (if any).
-     * @param start First index of binary search (starting at 0).
-     * @param end   Last index of binary search (starting at last list index).
-     * @return A non-negative number with index of first null field if found, -1 if otherwise.
-     */
-    int findFreeSlot(Object[] list, int start, int end) {
-        int mid = (start + end) / 2; // Assign middle number with average of start and end.
-        // Recursion base: No empty slot found and reached last index. Return default number (-1).
-        if (end < start) {
-            return -1;
-            // Recursion steps:
-        } else if (list[mid] != null) {
-            // If mid index not null, call method again with start as (mid + 1).
-            return this.findFreeSlot(list, mid + 1, end);
-        } else if (mid == 0 || list[mid - 1] != null) {
-            // Mid index is null. If mid is first index or index before it is not null: empty slot found.
-            return mid;
-        }
-        // Empty slot not found yet: call method again with end as (mid - 1).
-        return this.findFreeSlot(list, start, mid - 1);
+        return -1;
     }
 
     /**
@@ -252,27 +235,5 @@ class Library {
             return false;
         }
         return list[id] != null; // boolean value if this id represents assigned object or null.
-    }
-
-    /**
-     * Helper recursive method to find if patron can borrow book.
-     *
-     * @param patronId      Patron id to check.
-     * @param idx           Index of library books list.
-     * @param booksBorrowed Counter of how many borrowed books found so far.
-     * @return True if patron can borrow more books, false if otherwise.
-     */
-    boolean patronCanBorrow(int patronId, int idx, int booksBorrowed) {
-        // Recursion base: If null index found or index out of list range.
-        if (idx >= this.libraryBooks.length || this.libraryBooks[idx] == null) {
-            // Returns true if patron not over the max borrowed books, false otherwise.
-            return booksBorrowed < this.maxBorrowedBooks;
-        } else if (this.libraryBooks[idx].getCurrentBorrowerId() == patronId) { // Recursion steps:
-            // If book has patron id marked as borrower, call method again with next index and add 1 to counter.
-            return this.patronCanBorrow(patronId, idx + 1, booksBorrowed + 1);
-        } else {
-            // Book is not borrowed or has other borrower, call method again with next index.
-            return this.patronCanBorrow(patronId, idx + 1, booksBorrowed);
-        }
     }
 }

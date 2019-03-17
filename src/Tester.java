@@ -81,7 +81,7 @@ public class Tester {
             String bookName = book1.stringRepresentation();
             String borrowerName = patron.stringRepresentation();
             int borrowerID = book1.getCurrentBorrowerId();
-            int enjoyment = patron.patronEnjoymentThreshold;
+            int enjoyment = patron.ENJOYMENT_THRESHOLD;
             int bookScore = patron.getBookScore(book1);
             boolean willEnjoy = patron.willEnjoyBook(book1);
             System.out.println("Tendency: " + enjoyment + ", Book score: " + bookScore + ", Will enjoy?" + willEnjoy);
@@ -89,7 +89,7 @@ public class Tester {
         }
         library.borrowBook(10, 9);
         System.out.println("::BOOK SUGGESTION::");
-        System.out.println("Patron's enjoyment: " + library.libraryPatrons[9].patronEnjoymentThreshold);
+        System.out.println("Patron's enjoyment: " + library.libraryPatrons[9].ENJOYMENT_THRESHOLD);
         for (Book item : library.libraryBooks) {
             if (item == null)
                 break;
