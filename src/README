@@ -1,0 +1,59 @@
+dgropp
+
+
+
+=============================
+=      File description     =
+=============================
+Book.java -     This class represents a book, which has a title, author, year of publication and different
+                literary aspects.
+Patron.java -   This class represents a library patron that has a name and assigns values to different literary
+                aspects of books.
+Library.java -  This class represents a library, which hold a collection of books. Patrons can register at the library
+                to be able to check out books, if a copy of the requested book is available.
+
+
+
+=============================
+=          Design           =
+=============================
+- Store book/patrons -
+    Upon construction I created an Object[] array for respective field. Its length is the max number of books/patrons
+    defined on object creation. The initial arrays contain null values.
+- Insert books/patrons -
+    Inserting new object to the array requires finding the first null field, that comes after an existing object. If
+    no null fields found, it means the array is full (reached max capacity). To find this first null field, one must go
+    over the whole array. But, as the array can hold many entries and it is sorted (new entry always comes after an
+    existing entry), I defined a binary search method to find the first null field (worst case: O(log n)).
+- Books suggestions -
+    Each book gets a score for this patron, based on instructions in the assignment API. After that another method
+    compares this book's score to patron's minimal enjoyment threshold, and assumes patron will enjoy the book if
+    the score is bigger/equal to patron's minimal enjoyment threshold. The book suggestion method goes over the whole
+    books array and seeks an available book (not borrowed) that meets this enjoyment assumption, if found.
+    The method uses a loop that breaks once a relevant book found or reached null/end of array (worst case: O(n)).
+- Borrow book -
+    This method needs to check few tests before it can assign book to patron: (1) IDs are valid. (2) patron will enjoy
+    book. (3) book is available. (4) patron has not reached its max borrows. Tests 1-3 are described in assignment API,
+    and are called and assigned to boolean values. Test 4 calls a helper method, that goes over the whole book array.
+    The method uses recursive algorithm, that checks each book for borrower ID. Each time the ID matches the patron's
+    ID it calls the method again with updated counter. Once it reaches the max borrow number allowed, or reaches first
+    null/end of array, it breaks and return the result respectively (worst case: O(n)).
+- Helper methods -
+    Some actions regarding books and patrons insertion, validation, etc. seemed quite similar. To avoid writing code
+    twice, I defined helper methods to insert book/patrons, to validate and fetch their IDs, and to handle more
+    complex issues, such as finding if a patron can borrow book or which slot in the array is the first null field.
+
+
+
+=============================
+=  Implementation details   =
+=============================
+Implementation issues: this section should contain all important comments about implementation
+issues that you think would help understanding your code or should be pointed out since they are
+important in some sense.
+
+
+=============================
+=    Answers to questions   =
+=============================
+No questions for this exercise.
