@@ -2,6 +2,7 @@ dgropp
 
 
 
+
 =============================
 =      File description     =
 =============================
@@ -17,6 +18,23 @@ Library.java -  This class represents a library, which hold a collection of book
 =============================
 =          Design           =
 =============================
+- Max borrows -
+    It would have been possible to assign each Patron object a borrows counter and then on each borrow append this
+    counter, and on each return subtract from it. Then, on each borrow attempt it would be possible to compare this
+    counter to max books constant, instead of looping over the book array. The run-time complexity would be much better
+    (O(1)), but the Patron class would hold vars and methods that actually deal with library issues, and it could hold
+    a future problem if Patron can belong to multiple libraries, for instance. So, I sacrificed some efficiency and
+    kept this test in Library class, thus looping over the book array (worst case: O(n)).
+- Helper methods -
+    Some actions regarding books and patrons insertion, validation, etc. seemed quite similar. To avoid writing code
+    twice, I defined helper methods to insert book/patrons, to validate and fetch their IDs, and to handle more
+    complex issues.
+
+
+
+=============================
+=  Implementation details   =
+=============================
 - Store book/patrons -
     Upon construction I created an Object[] array for respective field. Its length is the max number of books/patrons
     defined on object creation. The initial arrays contain null values.
@@ -31,29 +49,16 @@ Library.java -  This class represents a library, which hold a collection of book
     Each book gets a score for this patron, based on instructions in the assignment API. After that another method
     compares this book's score to patron's minimal enjoyment threshold, and assumes patron will enjoy the book if
     the score is bigger/equal to patron's minimal enjoyment threshold. The book suggestion method goes over the whole
-    books array and seeks an available book (not borrowed) that meets this enjoyment assumption, if found.
-    The method uses a loop that breaks once a relevant book found or reached null/end of array (worst case: O(n)).
-- Max borrows -
-    On each Patron object construction, starts borrows counter. Each book assigned to patron, adds 1 to patron. Each
-    book returned by patron, removes 1 from patron. When patron tries to borrow new book, instead of iterating on the
-    whole book array (O(n)), comparing the borrows counter to the max borrowed assigned (O(1)).
+    books array and seeks an available book (not borrowed) that meets this enjoyment assumption, if found. Once found,
+    saves this book's score and index and keep on searching for any other relevant books with higher scores. The method
+    uses a loop that breaks once reached null/end of array (worst case: O(n)), and returns the books with highest score.
 - Borrow book -
-    This method needs to check few tests before it can assign book to patron: (1) IDs are valid. (2) patron will enjoy
-    book. (3) book is available. (4) patron has not reached max borrows. Tests 1-3 are described in assignment API, and
-    are called and assigned to boolean values. Test 4 described above. When all tests pass, book is marked as borrowed.
-- Helper methods -
-    Some actions regarding books and patrons insertion, validation, etc. seemed quite similar. To avoid writing code
-    twice, I defined helper methods to insert book/patrons, to validate and fetch their IDs, and to handle more
-    complex issues, such as finding if a patron can borrow book or which slot in the array is the first null field.
+    This method checks few tests before it assigns book to patron: (1) IDs are valid. (2) patron will enjoy book.
+    (3) book is available. (4) patron has not reached max borrows. Each test is performed in dedicated method, and *all*
+    tests must pass. Tests 1-3 require run-time complexity of O(1), and test 4 (described above) require O(n). So, to
+    save efficiency, tests 1-3 are performed before test 4, and if any test fails, the rest of the tests are never
+    performed (using & in the conditional, instead of &&). If all tests pass, book is marked as borrowed to this patron.
 
-
-
-=============================
-=  Implementation details   =
-=============================
-Implementation issues: this section should contain all important comments about implementation
-issues that you think would help understanding your code or should be pointed out since they are
-important in some sense.
 
 
 =============================

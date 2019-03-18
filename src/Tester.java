@@ -87,7 +87,6 @@ public class Tester {
             System.out.println("Tendency: " + enjoyment + ", Book score: " + bookScore + ", Will enjoy?" + willEnjoy);
             System.out.println("Book " + bookName + " was borrowed by " + borrowerName + ": " + borrowerID);
         }
-        library.borrowBook(10, 9);
         System.out.println("::BOOK SUGGESTION::");
         System.out.println("Patron's enjoyment: " + library.libraryPatrons[9].ENJOYMENT_THRESHOLD);
         for (Book item : library.libraryBooks) {

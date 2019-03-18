@@ -29,9 +29,8 @@ class Library {
         this.MAX_BOOKS = maxBookCapacity;
         this.MAX_BORROWS = maxBorrowedBooks;
         this.MAX_PATRONS = maxPatronCapacity;
-        // Assign books array with null Book objects to match max nook capacity.
+        // Assign books/patrons array with null objects to match given input max capacity.
         this.libraryBooks = new Book[this.MAX_BOOKS];
-        // Assign patrons array with null Patron objects to match max patron capacity.
         this.libraryPatrons = new Patron[this.MAX_PATRONS];
     }
 
@@ -125,21 +124,16 @@ class Library {
     boolean borrowBook(int bookId, int patronId) {
         // Before starting whole process, checks if book and patron ID's are valid.
         if (this.isBookIdValid(bookId) && this.isPatronIdValid(patronId)) {
+            Book book = this.libraryBooks[bookId];
             Patron patron = this.libraryPatrons[patronId];
-            // See if patron's borrowed books num is smaller than max borrowed books var.
-            boolean canBorrow = patron.getBorrowedBooks() < this.MAX_BORROWS;
-            // Call willEnjoyBook() method from Patron class to determine if patron will enjoy the book.
-            boolean willEnjoy = this.libraryPatrons[patronId].willEnjoyBook(this.libraryBooks[bookId]);
-            // Call isBookAvailable() method to determine if book is available to borrow.
-            boolean isAvailable = this.isBookAvailable(bookId);
-            // If all tests were true, mark book as borrowed to this patron, and return true.
-            if (canBorrow && willEnjoy && isAvailable) {
-                this.libraryBooks[bookId].setBorrowerId(patronId);
-                this.libraryPatrons[patronId].addBorrow();
+            // If book is available to borrow & patron will enjoy the book & patron's borrows are not over the max:
+            if (this.isBookAvailable(bookId) & patron.willEnjoyBook(book) & this.patronCanBorrow(patronId)) {
+                // Passed tests. Mark book as borrowed to this patron, and return true.
+                book.setBorrowerId(patronId);
                 return true;
             }
         }
-        return false; // If at least 1 test failed.
+        return false; // At least 1 test failed.
     }
 
     /**
@@ -149,11 +143,7 @@ class Library {
      */
     void returnBook(int bookId) {
         if (this.isBookIdValid(bookId)) {
-            int borrowerId = this.libraryBooks[bookId].getCurrentBorrowerId();
-            if (this.isPatronIdValid(borrowerId)) {
-                this.libraryPatrons[borrowerId].returnBorrow();
-                this.libraryBooks[bookId].returnBook();
-            }
+            this.libraryBooks[bookId].returnBook(); // Call returnBook() method from Book class.
         }
     }
 
@@ -165,6 +155,8 @@ class Library {
      * @return The available book the patron with the given will enjoy the most. Null if no book is available.
      */
     Book suggestBookToPatron(int patronId) {
+        int bestScore = -1;
+        int bestScoreId = -1;
         // Before starting whole process, checks if patron ID is valid.
         if (this.isPatronIdValid(patronId)) {
             Patron patron = this.libraryPatrons[patronId];
@@ -174,14 +166,22 @@ class Library {
                 // If book object is null, break loop.
                 if (book == null) {
                     break;
-                }
-                // Calls Patron class method that determines if patron will enjoy book, and checks if it is available.
-                else if (patron.willEnjoyBook(book) && this.isBookAvailable(id)) {
-                    return book;
+                } else if (patron.willEnjoyBook(book) && this.isBookAvailable(id)) {
+                    // Calls Patron method that determines if patron will enjoy book, and checks if it is available.
+                    int score = patron.getBookScore(book);
+                    // If this score is better than current best score, assign to it this score and id.
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestScoreId = id;
+                    }
                 }
             }
         }
-        return null; // If no books found.
+        // If found any score, return the book with the best relevant score.
+        if (bestScore != -1) {
+            return this.libraryBooks[bestScoreId];
+        }
+        return null; // No books found, or patron id not valid.
     }
 
     /**
@@ -235,5 +235,26 @@ class Library {
             return false;
         }
         return list[id] != null; // boolean value if this id represents assigned object or null.
+    }
+
+    /**
+     * Helper method to find if patron can borrow book.
+     *
+     * @param patronId Patron id to check.
+     * @return True if patron can borrow more books, false if otherwise.
+     */
+    boolean patronCanBorrow(int patronId) {
+        int booksBorrowed = 0; // Initialize borrowed books counter.
+        // Loop over the whole book array.
+        for (Book item : this.libraryBooks) {
+            // If found null entry or counter reached its max, break loop.
+            if (item == null || booksBorrowed >= this.MAX_BORROWS) {
+                break;
+                // If book item's borrower's id is same as patron's, add 1 to counter.
+            } else if (item.getCurrentBorrowerId() == patronId) {
+                booksBorrowed++;
+            }
+        }
+        return booksBorrowed < this.MAX_BORROWS; // Compare counter to max borrows allowed.
     }
 }

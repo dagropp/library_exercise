@@ -10,7 +10,6 @@ class Patron {
     final int DRAMATIC_TENDENCY; // The weight this patron assigns to the dramatic aspects of books.
     final int EDUCATIONAL_TENDENCY; // The weight this patron assigns to the educational aspects of books.
     final int ENJOYMENT_THRESHOLD; // The minimal literary value a book must have for this patron to enjoy it.
-    int borrowedBooks;
 
     /*----=  Constructors  =-----*/
 
@@ -36,7 +35,6 @@ class Patron {
         this.DRAMATIC_TENDENCY = dramaticTendency;
         this.EDUCATIONAL_TENDENCY = educationalTendency;
         this.ENJOYMENT_THRESHOLD = patronEnjoymentThreshold;
-        this.borrowedBooks = 0;
     }
 
     /*----=  Instance Methods  =-----*/
@@ -74,17 +72,5 @@ class Patron {
      */
     boolean willEnjoyBook(Book book) {
         return this.getBookScore(book) >= this.ENJOYMENT_THRESHOLD;
-    }
-
-    void addBorrow() {
-        this.borrowedBooks++;
-    }
-
-    void returnBorrow() {
-        this.borrowedBooks--;
-    }
-
-    int getBorrowedBooks() {
-        return this.borrowedBooks;
     }
 }
