@@ -4,37 +4,37 @@
  * @author dgropp
  */
 class Patron {
-    final String FIRST_NAME; // The first name of this patron.
-    final String LAST_NAME; // The last name of this patron.
-    final int COMIC_TENDENCY; // The weight this patron assigns to the comic aspects of books.
-    final int DRAMATIC_TENDENCY; // The weight this patron assigns to the dramatic aspects of books.
-    final int EDUCATIONAL_TENDENCY; // The weight this patron assigns to the educational aspects of books.
-    final int ENJOYMENT_THRESHOLD; // The minimal literary value a book must have for this patron to enjoy it.
+    private final String FIRST_NAME; // The first name of this patron.
+    private final String LAST_NAME; // The last name of this patron.
+    private final int COMIC_TENDENCY; // The weight this patron assigns to the comic aspects of books.
+    private final int DRAMATIC_TENDENCY; // The weight this patron assigns to the dramatic aspects of books.
+    private final int EDUCATIONAL_TENDENCY; // The weight this patron assigns to the educational aspects of books.
+    private final int ENJOYMENT_THRESHOLD; // The minimal literary value a book must have for this patron to enjoy it.
 
     /*----=  Constructors  =-----*/
 
     /**
      * Creates a new patron with the given characteristics.
      *
-     * @param patronFirstName          The first name of the patron.
-     * @param patronLastName           The last name of the patron.
-     * @param comicTendency            The weight the patron assigns to the comic aspects of books.
-     * @param dramaticTendency         The weight the patron assigns to the dramatic aspects of books.
-     * @param educationalTendency      The weight the patron assigns to the educational aspects of books.
-     * @param patronEnjoymentThreshold The minimal literary value a book must have for this patron to enjoy it.
+     * @param firstName           The first name of the patron.
+     * @param lastName            The last name of the patron.
+     * @param comicTendency       The weight the patron assigns to the comic aspects of books.
+     * @param dramaticTendency    The weight the patron assigns to the dramatic aspects of books.
+     * @param educationalTendency The weight the patron assigns to the educational aspects of books.
+     * @param enjoymentThreshold  The minimal literary value a book must have for this patron to enjoy it.
      */
-    Patron(String patronFirstName,
-           String patronLastName,
-           int comicTendency,
-           int dramaticTendency,
-           int educationalTendency,
-           int patronEnjoymentThreshold) {
-        this.FIRST_NAME = patronFirstName;
-        this.LAST_NAME = patronLastName;
+    public Patron(String firstName,
+                  String lastName,
+                  int comicTendency,
+                  int dramaticTendency,
+                  int educationalTendency,
+                  int enjoymentThreshold) {
+        this.FIRST_NAME = firstName;
+        this.LAST_NAME = lastName;
         this.COMIC_TENDENCY = comicTendency;
         this.DRAMATIC_TENDENCY = dramaticTendency;
         this.EDUCATIONAL_TENDENCY = educationalTendency;
-        this.ENJOYMENT_THRESHOLD = patronEnjoymentThreshold;
+        this.ENJOYMENT_THRESHOLD = enjoymentThreshold;
     }
 
     /*----=  Instance Methods  =-----*/

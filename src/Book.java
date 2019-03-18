@@ -3,39 +3,39 @@
  *
  * @author dgropp
  */
-class Book {
-    final String TITLE; // The title of this book.
-    final String AUTHOR; //The name of the author of this book.
-    final int PUBLICATION_YEAR; // The year this book was published.
-    final int COMIC_VALUE; // The comic value of this book
-    final int DRAMATIC_VALUE; // The dramatic value of this book.
-    final int EDUCATIONAL_VALUE; // The educational value of this book.
-    int currentBorrowerId = -1; // The id of the current borrower of this book.
+public class Book {
+    private final String TITLE; // The title of this book.
+    private final String AUTHOR; //The name of the author of this book.
+    private final int PUBLICATION_YEAR; // The year this book was published.
+    private final int COMIC_VALUE; // The comic value of this book
+    private final int DRAMATIC_VALUE; // The dramatic value of this book.
+    private final int EDUCATIONAL_VALUE; // The educational value of this book.
+    private static final int DEFAULT_NUM = -1; // Default num for empty slots and error values.
+    private int currentBorrowerId = Book.DEFAULT_NUM; // The id of the current borrower of this book.
 
     /*----=  Constructors  =-----*/
 
     /**
      * Creates a new book with the given characteristic.
      *
-     * @param bookTitle             The title of the book.
-     * @param bookAuthor            The name of the author of the book.
-     * @param bookYearOfPublication The year the book was published.
-     * @param bookComicValue        The comic value of the book.
-     * @param bookDramaticValue     The dramatic value of the book.
-     * @param bookEducationalValue  The educational value of the book.
+     * @param title            The title of the book.
+     * @param author           The name of the author of the book.
+     * @param publicationYear  The year the book was published.
+     * @param comicValue       The comic value of the book.
+     * @param dramaticValue    The dramatic value of the book.
+     * @param educationalValue The educational value of the book.
      */
-    Book(String bookTitle,
-         String bookAuthor,
-         int bookYearOfPublication,
-         int bookComicValue,
-         int bookDramaticValue,
-         int bookEducationalValue) {
-        this.TITLE = bookTitle;
-        this.AUTHOR = bookAuthor;
-        this.PUBLICATION_YEAR = bookYearOfPublication;
-        this.COMIC_VALUE = bookComicValue;
-        this.DRAMATIC_VALUE = bookDramaticValue;
-        this.EDUCATIONAL_VALUE = bookEducationalValue;
+    public Book(String title, String author,
+                int publicationYear,
+                int comicValue,
+                int dramaticValue,
+                int educationalValue) {
+        this.TITLE = title;
+        this.AUTHOR = author;
+        this.PUBLICATION_YEAR = publicationYear;
+        this.COMIC_VALUE = comicValue;
+        this.DRAMATIC_VALUE = dramaticValue;
+        this.EDUCATIONAL_VALUE = educationalValue;
     }
 
     /*----=  Instance Methods  =-----*/
@@ -52,14 +52,6 @@ class Book {
      */
     String stringRepresentation() {
         return "[" + this.TITLE + "," + this.AUTHOR + "," + this.PUBLICATION_YEAR + "," + this.getLiteraryValue() + "]";
-    }
-
-    /**
-     * @return the literary value of this book, which is defined as the sum of its comic value, its dramatic
-     * value and its educational value.
-     */
-    int getLiteraryValue() {
-        return this.COMIC_VALUE + this.DRAMATIC_VALUE + this.EDUCATIONAL_VALUE;
     }
 
     /**
@@ -82,7 +74,7 @@ class Book {
      * Marks this book as returned.
      */
     void returnBook() {
-        this.currentBorrowerId = -1;
+        this.setBorrowerId(Book.DEFAULT_NUM);
     }
 
     /**
@@ -104,5 +96,13 @@ class Book {
      */
     int getEducationalValue() {
         return this.EDUCATIONAL_VALUE;
+    }
+
+    /**
+     * @return the literary value of this book, which is defined as the sum of its comic value, its dramatic
+     * value and its educational value.
+     */
+    private int getLiteraryValue() {
+        return this.COMIC_VALUE + this.DRAMATIC_VALUE + this.EDUCATIONAL_VALUE;
     }
 }

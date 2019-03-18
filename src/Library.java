@@ -5,33 +5,26 @@
  * @author dgropp
  */
 
-class Library {
-
-    final int MAX_BOOKS; // The maximal number of books this library can hold.
-    final int MAX_BORROWS; // The maximal number of books this library allows a patron to borrow at the same time.
-    final int MAX_PATRONS; // The maximal number of registered patrons this library can handle.
-    Book[] libraryBooks; // Array of all library books and open book slots.
-    Patron[] libraryPatrons; // Array of all library patrons and open patron slots
+public class Library {
+    private final int MAX_BORROWS; // The maximal number of books this library allows patron to borrow at the same time.
+    private static final int DEFAULT_NUM = -1; // Default num for empty slots and error values.
+    private Book[] libraryBooks; // Array of all library books and open book slots.
+    private Patron[] libraryPatrons; // Array of all library patrons and open patron slots
 
     /*----=  Constructors  =-----*/
 
     /**
      * Creates a new library with the given parameters.
      *
-     * @param maxBookCapacity   The maximal number of books this library can hold.
-     * @param maxBorrowedBooks  The maximal number of books this library allows a single patron to borrow at the
-     *                          same time.
-     * @param maxPatronCapacity The maximal number of registered patrons this library can handle.
+     * @param maxBorrows The maximal number of books this library allows a single patron to borrow at the same time.
+     * @param maxBooks   The maximal number of books this library can hold.
+     * @param maxPatrons The maximal number of registered patrons this library can handle.
      */
-    Library(int maxBookCapacity,
-            int maxBorrowedBooks,
-            int maxPatronCapacity) {
-        this.MAX_BOOKS = maxBookCapacity;
-        this.MAX_BORROWS = maxBorrowedBooks;
-        this.MAX_PATRONS = maxPatronCapacity;
+    public Library(int maxBorrows, int maxBooks, int maxPatrons) {
+        this.MAX_BORROWS = maxBorrows;
         // Assign books/patrons array with null objects to match given input max capacity.
-        this.libraryBooks = new Book[this.MAX_BOOKS];
-        this.libraryPatrons = new Patron[this.MAX_PATRONS];
+        this.libraryBooks = new Book[maxBooks];
+        this.libraryPatrons = new Patron[maxPatrons];
     }
 
     /*----=  Instance Methods  =-----*/
@@ -48,37 +41,13 @@ class Library {
     }
 
     /**
-     * Returns true if the given number is an id of some book in the library, false otherwise.
-     *
-     * @param bookId The id to check.
-     * @return true if the given number is an id of some book in the library, false otherwise.
-     */
-    boolean isBookIdValid(int bookId) {
-        return idValid(bookId, this.libraryBooks); // Call idValid() helper method.
-    }
-
-    /**
-     * Returns the non-negative id number of the given book if he is owned by this library, -1 otherwise.
+     * Returns the non-negative id number of the given book if he is owned by this library, default num otherwise.
      *
      * @param book The book for which to find the id number.
-     * @return a non-negative id number of the given book if he is owned by this library, -1 otherwise.
+     * @return a non-negative id number of the given book if he is owned by this library, default num otherwise.
      */
     int getBookId(Book book) {
         return this.getId(book, this.libraryBooks); // Call getId() helper method.
-    }
-
-    /**
-     * Returns true if the book with the given id is available, false otherwise.
-     *
-     * @param bookId The id number of the book to check.
-     * @return true if the book with the given id is available, false otherwise.
-     */
-    boolean isBookAvailable(int bookId) {
-        // Checks if Book ID is valid, and if so checks if is different than default book borrower num (-1).
-        if (this.isBookIdValid(bookId)) {
-            return this.libraryBooks[bookId].getCurrentBorrowerId() == -1;
-        }
-        return false;
     }
 
     /**
@@ -93,20 +62,10 @@ class Library {
     }
 
     /**
-     * Returns true if the given number is an id of a patron in the library, false otherwise.
-     *
-     * @param patronId The id to check.
-     * @return true if the given number is an id of a patron in the library, false otherwise.
-     */
-    boolean isPatronIdValid(int patronId) {
-        return idValid(patronId, this.libraryPatrons); // Call idValid() helper method.
-    }
-
-    /**
-     * Returns the non-negative id number of the given patron if he is registered to this library, -1 otherwise.
+     * Returns non-negative id number of the given patron if he is registered to this library, default num otherwise.
      *
      * @param patron The patron for which to find the id number.
-     * @return a non-negative id number of the given patron if he is registered to this library, -1 otherwise.
+     * @return a non-negative id number of the given patron if he is registered to this library, default num otherwise.
      */
     int getPatronId(Patron patron) {
         return this.getId(patron, this.libraryPatrons); // Call getId() helper method.
@@ -155,8 +114,8 @@ class Library {
      * @return The available book the patron with the given will enjoy the most. Null if no book is available.
      */
     Book suggestBookToPatron(int patronId) {
-        int bestScore = -1;
-        int bestScoreId = -1;
+        int bestScore = Library.DEFAULT_NUM;
+        int bestScoreId = Library.DEFAULT_NUM;
         // Before starting whole process, checks if patron ID is valid.
         if (this.isPatronIdValid(patronId)) {
             Patron patron = this.libraryPatrons[patronId];
@@ -178,10 +137,44 @@ class Library {
             }
         }
         // If found any score, return the book with the best relevant score.
-        if (bestScore != -1) {
+        if (bestScore != Library.DEFAULT_NUM) {
             return this.libraryBooks[bestScoreId];
         }
         return null; // No books found, or patron id not valid.
+    }
+
+    /**
+     * Returns true if the book with the given id is available, false otherwise.
+     *
+     * @param bookId The id number of the book to check.
+     * @return true if the book with the given id is available, false otherwise.
+     */
+    private boolean isBookAvailable(int bookId) {
+        // Checks if Book ID is valid, and if so checks if is different than default book borrower num.
+        if (this.isBookIdValid(bookId)) {
+            return this.libraryBooks[bookId].getCurrentBorrowerId() == Library.DEFAULT_NUM;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the given number is an id of some book in the library, false otherwise.
+     *
+     * @param bookId The id to check.
+     * @return true if the given number is an id of some book in the library, false otherwise.
+     */
+    private boolean isBookIdValid(int bookId) {
+        return idValid(bookId, this.libraryBooks); // Call idValid() helper method.
+    }
+
+    /**
+     * Returns true if the given number is an id of a patron in the library, false otherwise.
+     *
+     * @param patronId The id to check.
+     * @return true if the given number is an id of a patron in the library, false otherwise.
+     */
+    private boolean isPatronIdValid(int patronId) {
+        return idValid(patronId, this.libraryPatrons); // Call idValid() helper method.
     }
 
     /**
@@ -192,7 +185,7 @@ class Library {
      * @return A non-negative id number for the insert if the input was successfully added,
      * or if the input was already in the list; a negative number otherwise.
      */
-    int attemptInsert(Object input, Object[] list) {
+    private int attemptInsert(Object input, Object[] list) {
         for (int id = 0; id < list.length; id++) {
             if (list[id] == input) {
                 return id;
@@ -201,7 +194,7 @@ class Library {
                 return id;
             }
         }
-        return -1;
+        return Library.DEFAULT_NUM;
     }
 
     /**
@@ -209,9 +202,9 @@ class Library {
      *
      * @param input Object to find ID of.
      * @param list  Array to find ID in.
-     * @return A non-negative id number if found, -1 otherwise.
+     * @return A non-negative id number if found, default num otherwise.
      */
-    int getId(Object input, Object[] list) {
+    private int getId(Object input, Object[] list) {
         // Loops over the object list.
         for (int id = 0; id < list.length; id++) {
             // If list entry matches input, returns its index.
@@ -219,7 +212,7 @@ class Library {
                 return id;
             }
         }
-        return -1; // Nothing found.
+        return Library.DEFAULT_NUM; // Nothing found.
     }
 
     /**
@@ -229,7 +222,7 @@ class Library {
      * @param list To check ID existence in.
      * @return True if in range and not null, false if otherwise.
      */
-    boolean idValid(int id, Object[] list) {
+    private boolean idValid(int id, Object[] list) {
         // Checks if id is in list range, and if not return false.
         if (id >= list.length || id < 0) {
             return false;
@@ -243,7 +236,7 @@ class Library {
      * @param patronId Patron id to check.
      * @return True if patron can borrow more books, false if otherwise.
      */
-    boolean patronCanBorrow(int patronId) {
+    private boolean patronCanBorrow(int patronId) {
         int booksBorrowed = 0; // Initialize borrowed books counter.
         // Loop over the whole book array.
         for (Book item : this.libraryBooks) {
